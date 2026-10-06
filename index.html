@@ -1,0 +1,1105 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QCM - Créer ses documents multimédia !</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --card-hover: #262626;
+            --text-color: #E0E0E0;
+            --text-muted: #9E9E9E;
+            --accent-color: #DEFF9A;
+            --accent-hover: #c9f578;
+            --correct-color: #4EAE67;
+            --correct-bg: rgba(78, 174, 103, 0.15);
+            --wrong-color: #FF6B6B;
+            --wrong-bg: rgba(255, 107, 107, 0.15);
+            --border-color: #2F2F2F;
+            --border-radius: 14px;
+            --font-stack: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: var(--font-stack);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 16px;
+            line-height: 1.5;
+        }
+
+        .quiz-wrapper {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 16px 36px rgba(0, 0, 0, 0.6);
+            width: 100%;
+            max-width: 780px;
+            padding: 28px;
+            position: relative;
+        }
+
+        /* En-tête */
+        .quiz-header {
+            margin-bottom: 22px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 18px;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .tag-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(222, 255, 154, 0.12);
+            color: var(--accent-color);
+            border: 1px solid rgba(222, 255, 154, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .score-pill {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            background-color: #121212;
+            padding: 4px 12px;
+            border-radius: 12px;
+            border: 1px solid var(--border-color);
+        }
+
+        h1 {
+            font-size: 1.55rem;
+            color: #FFFFFF;
+            font-weight: 700;
+        }
+
+        /* Progression */
+        .progress-section {
+            margin-top: 14px;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.82rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-bottom: 6px;
+        }
+
+        .progress-track {
+            width: 100%;
+            height: 8px;
+            background-color: #121212;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #A8E85A, var(--accent-color));
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 6px;
+        }
+
+        /* Questions */
+        .question-card {
+            margin: 20px 0;
+        }
+
+        .question-number {
+            font-size: 0.85rem;
+            color: var(--accent-color);
+            font-weight: 700;
+            margin-bottom: 6px;
+            text-transform: uppercase;
+        }
+
+        .question-title {
+            font-size: 1.18rem;
+            color: #FFFFFF;
+            font-weight: 600;
+            margin-bottom: 18px;
+            line-height: 1.4;
+        }
+
+        /* Réponses */
+        .options-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .option-button {
+            background-color: #232323;
+            border: 1.5px solid #333333;
+            border-radius: 10px;
+            color: var(--text-color);
+            padding: 14px 16px;
+            font-size: 0.98rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            font-family: inherit;
+        }
+
+        .option-button:hover:not(:disabled) {
+            background-color: var(--card-hover);
+            border-color: var(--accent-color);
+            transform: translateX(4px);
+        }
+
+        .option-button:disabled {
+            cursor: default;
+        }
+
+        .option-button.correct {
+            background-color: var(--correct-bg);
+            border-color: var(--correct-color);
+            color: #FFFFFF;
+            font-weight: 600;
+        }
+
+        .option-button.correct::after {
+            content: "✓";
+            color: var(--correct-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.wrong {
+            background-color: var(--wrong-bg);
+            border-color: var(--wrong-color);
+            color: #FFFFFF;
+        }
+
+        .option-button.wrong::after {
+            content: "✕";
+            color: var(--wrong-color);
+            font-size: 1.2rem;
+            font-weight: bold;
+        }
+
+        .option-button.dimmed {
+            opacity: 0.45;
+        }
+
+        /* Feedback */
+        .feedback-container {
+            margin-top: 18px;
+            padding: 14px 16px;
+            border-radius: 8px;
+            display: none;
+            animation: fadeIn 0.25s ease;
+        }
+
+        .feedback-container.correct {
+            background-color: var(--correct-bg);
+            border-left: 4px solid var(--correct-color);
+        }
+
+        .feedback-container.wrong {
+            background-color: var(--wrong-bg);
+            border-left: 4px solid var(--wrong-color);
+        }
+
+        .feedback-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .feedback-container.correct .feedback-title {
+            color: var(--correct-color);
+        }
+
+        .feedback-container.wrong .feedback-title {
+            color: var(--wrong-color);
+        }
+
+        .feedback-text {
+            font-size: 0.9rem;
+            color: var(--text-color);
+            line-height: 1.45;
+        }
+
+        /* Actions */
+        .actions-row {
+            margin-top: 22px;
+            display: flex;
+            justify-content: flex-end;
+        }
+
+        .btn-action {
+            background-color: var(--accent-color);
+            color: #121212;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-action:hover:not(:disabled) {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 14px rgba(222, 255, 154, 0.25);
+        }
+
+        .btn-action:disabled {
+            background-color: #2D2D2D;
+            color: #666666;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        /* Écran des résultats */
+        .results-view {
+            text-align: center;
+            padding: 10px 0;
+            display: none;
+            animation: fadeIn 0.35s ease;
+        }
+
+        .score-circle-wrapper {
+            position: relative;
+            width: 150px;
+            height: 150px;
+            margin: 0 auto 20px auto;
+            border-radius: 50%;
+            background: #171717;
+            border: 4px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 24px rgba(222, 255, 154, 0.15);
+        }
+
+        .score-val {
+            font-size: 2.6rem;
+            font-weight: 800;
+            color: var(--accent-color);
+            line-height: 1;
+        }
+
+        .score-sub {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-top: 4px;
+        }
+
+        .results-view h2 {
+            font-size: 1.5rem;
+            color: #FFFFFF;
+            margin-bottom: 10px;
+        }
+
+        .result-description {
+            font-size: 0.98rem;
+            color: var(--text-color);
+            max-width: 580px;
+            margin: 0 auto 24px auto;
+            line-height: 1.5;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            max-width: 360px;
+            margin: 0 auto 24px auto;
+        }
+
+        .stat-box {
+            background-color: #151515;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 12px;
+        }
+
+        .stat-num {
+            font-size: 1.3rem;
+            font-weight: 700;
+        }
+
+        .stat-num.succ { color: var(--correct-color); }
+        .stat-num.err { color: var(--wrong-color); }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 600px) {
+            .quiz-wrapper {
+                padding: 18px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .question-title {
+                font-size: 1.05rem;
+            }
+            .option-button {
+                padding: 12px 14px;
+                font-size: 0.9rem;
+            }
+            .score-circle-wrapper {
+                width: 130px;
+                height: 130px;
+            }
+            .score-val {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="quiz-wrapper">
+        <!-- VUE DU QUESTIONNAIRE -->
+        <div id="quiz-view">
+            <div class="quiz-header">
+                <div class="header-top">
+                    <span class="tag-badge">🎬 Documents Multimédia</span>
+                    <span class="score-pill" id="live-score">Score : 0 / 40</span>
+                </div>
+                <h1>Créer ses documents multimédia</h1>
+                <div class="progress-section">
+                    <div class="progress-info">
+                        <span>Progression</span>
+                        <span id="progress-text">Question 1 sur 40</span>
+                    </div>
+                    <div class="progress-track">
+                        <div class="progress-bar" id="progress-bar"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="question-card">
+                <div class="question-number" id="question-index-label">Question 1</div>
+                <div class="question-title" id="question-text">Chargement de la question...</div>
+                <div class="options-list" id="options-container"></div>
+            </div>
+
+            <div class="feedback-container" id="feedback-box">
+                <div class="feedback-title" id="feedback-title">Bonne réponse !</div>
+                <div class="feedback-text" id="feedback-desc">Explication pédagogique...</div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn-action" id="next-btn" disabled>Question suivante ➔</button>
+            </div>
+        </div>
+
+        <!-- VUE DES RÉSULTATS -->
+        <div class="results-view" id="results-view">
+            <span class="tag-badge" style="margin-bottom: 14px;">Bilan de Compétences Multimédia</span>
+            
+            <div class="score-circle-wrapper">
+                <div class="score-val" id="final-percent">0%</div>
+                <div class="score-sub">Score Final</div>
+            </div>
+
+            <h2 id="result-title-text">Niveau Multimédia</h2>
+            <p class="result-description" id="result-desc-text">Commentaire d'évaluation...</p>
+
+            <div class="summary-stats">
+                <div class="stat-box">
+                    <div class="stat-num succ" id="stat-correct-count">0</div>
+                    <div class="stat-label">Réponses correctes</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-num err" id="stat-wrong-count">0</div>
+                    <div class="stat-label">Erreurs / Pièges</div>
+                </div>
+            </div>
+
+            <button class="btn-action" onclick="restartQuiz()">🔄 Recommencer le test</button>
+        </div>
+    </div>
+
+    <script>
+        const rawQuestions = [
+            // Slide 1 & 2 : Introduction & C'est quoi le multimédia ?
+            {
+                q: "Qu'est-ce qu'un document « multimédia » selon le cours ?",
+                options: [
+                    "Un document qui combine textes, images, sons et vidéos pour enrichir ses créations",
+                    "Un fichier composé exclusivement de texte noir sur fond blanc",
+                    "Un jeu vidéo acheté en magasin",
+                    "Un câble reliant l'ordinateur au vidéoprojecteur"
+                ],
+                answer: 0,
+                feedback: "Le multimédia désigne l'association harmonieuse de plusieurs médias : texte, image, audio et vidéo."
+            },
+            {
+                q: "Quel est l'objectif principal de l'apprentissage du multimédia au collège ?",
+                options: [
+                    "Enrichir ses exposés et ses créations pour mieux communiquer",
+                    "Remplacer tous les professeurs par des robots",
+                    "Télécharger des films payants sans autorisation",
+                    "Passer plus de temps à jouer sur son smartphone"
+                ],
+                answer: 0,
+                feedback: "Le multimédia permet d'apprendre à structurer et transmettre des connaissances de façon vivante et percutante."
+            },
+
+            // Slide 3 : Pourquoi enrichir son texte ? (4 raisons)
+            {
+                q: "Pourquoi est-il utile d'enrichir un texte avec des médias pour « Rendre le document attrayant » ?",
+                options: [
+                    "Pour donner envie au lecteur de tout lire grâce à une mise en page soignée",
+                    "Pour masquer le fait qu'on n'a pas travaillé",
+                    "Pour utiliser toute l'encre de l'imprimante",
+                    "Pour que le fichier pèse plus de 10 Go"
+                ],
+                answer: 0,
+                feedback: "Un document visuellement attrayant capte l'attention et suscite l'intérêt du lecteur."
+            },
+            {
+                q: "Quelle expression résume l'intérêt d'ajouter une illustration pour « Aider à comprendre » ?",
+                options: [
+                    "« Un schéma vaut parfois un long discours »",
+                    "« Plus il y a de mots compliqués, mieux c'est »",
+                    "« Les images remplacent la réflexion »",
+                    "« Il ne faut jamais mettre de titres »"
+                ],
+                answer: 0,
+                feedback: "Un schéma ou une infographie synthétise des explications complexes bien plus vite qu'un texte dense."
+            },
+            {
+                q: "Pourquoi le multimédia aide-t-il le cerveau pour « Mieux retenir » l'information ?",
+                options: [
+                    "Notre cerveau retient beaucoup mieux quand il voit et écoute en même temps",
+                    "Les sons effacent la fatigue du cerveau",
+                    "Les vidéos permettent de ne plus réviser",
+                    "Le cerveau humain ne sait pas lire les textes sans musique"
+                ],
+                answer: 0,
+                feedback: "Associer le canal visuel et le canal auditif stimule la mémoire à long terme."
+            },
+            {
+                q: "En quoi le multimédia permet-il d'« Exprimer sa créativité » ?",
+                options: [
+                    "Il permet de concevoir un exposé original et personnalisé qui te ressemble",
+                    "Il oblige à copier mot pour mot les exposés d'Internet",
+                    "Il impose d'utiliser les mêmes couleurs que tout le monde",
+                    "Il supprime toute liberté de mise en page"
+                ],
+                answer: 0,
+                feedback: "Combiner différents formats donne libre cours à l'originalité et à l'expression personnelle."
+            },
+
+            // Slide 4 : Les 4 formes du multimédia
+            {
+                q: "Quelles sont « Les 4 formes du multimédia » détaillées dans le cours ?",
+                options: [
+                    "Le Texte, L'Image, Le Son, La Vidéo",
+                    "L'Écran, Le Clavier, La Souris, Le Casque",
+                    "Word, Excel, PowerPoint, Paint",
+                    "Le Papier, Le Stylo, Le Crayon, La Gomme"
+                ],
+                answer: 0,
+                feedback: "Le quatuor multimédia repose sur : Texte (idées), Image (illustration), Son (vie) et Vidéo (mouvement)."
+            },
+            {
+                q: "Dans un document multimédia, quel est le rôle spécifique du « Texte » ?",
+                options: [
+                    "Apporter des mots, des titres et des explications pour transmettre une idée claire",
+                    "Faire du bruit de fond",
+                    "Remplacer les photographies",
+                    "Animer les personnages en 3D"
+                ],
+                answer: 0,
+                feedback: "Le texte structure l'argumentation et apporte des définitions et explications précises."
+            },
+            {
+                q: "Que regroupe la catégorie « L'Image » selon le cours ?",
+                options: [
+                    "Photos, schémas ou dessins pour illustrer ce qu'on explique",
+                    "Uniquement des enregistrements de voix",
+                    "Des fichiers de musique MP3",
+                    "Des extraits de films au cinéma"
+                ],
+                answer: 0,
+                feedback: "Les images englobent les photographies réelles, les croquis, les infographies et les schémas."
+            },
+            {
+                q: "À quoi sert l'utilisation du « Son » dans une production multimédia ?",
+                options: [
+                    "Voix enregistrée, musique ou bruits de fond pour donner de la vie au projet",
+                    "Rendre le fichier invisible sur le réseau",
+                    "Écrire des sous-titres automatiques",
+                    "Empêcher les élèves d'écouter l'orateur"
+                ],
+                answer: 0,
+                feedback: "Le son (voix-off, ambiance sonore, bruitages) dynamise et humanise la présentation."
+            },
+            {
+                q: "Que permet la « Vidéo » par rapport à une image fixe ?",
+                options: [
+                    "Intégrer des extraits de films, des animations ou des enregistrements en mouvement",
+                    "Prendre moins de place sur le disque dur",
+                    "Remplacer le texte par un fichier muet",
+                    "Imprimer une page en 3 dimensions"
+                ],
+                answer: 0,
+                feedback: "La vidéo combine image en mouvement et son pour montrer des actions dynamiques."
+            },
+
+            // Slide 5 : Travailler avec les images : Photo ou capture d'écran ?
+            {
+                q: "Qu'est-ce qu'une « Photo numérique » selon le cours ?",
+                options: [
+                    "Une prise de vue avec un appareil photo ou une tablette (expérience en science, œuvre en art, objet réel)",
+                    "Une copie pixel par pixel de l'écran d'ordinateur",
+                    "Un dessin fait à la main sans appareil",
+                    "Une musique enregistrée avec un micro"
+                ],
+                answer: 0,
+                feedback: "La photo capture le monde réel : manipulation scientifique en classe, objet, monument..."
+            },
+            {
+                q: "Qu'est-ce qu'une « Capture d'écran » ?",
+                options: [
+                    "Une copie exacte de ce qui est affiché sur ton écran d'ordinateur (très pratique pour un détail ou une carte)",
+                    "Une photo prise avec un smartphone pointé vers sa chambre",
+                    "Un filtre magique pour changer les couleurs d'un texte",
+                    "Une vidéo téléchargée sur Internet"
+                ],
+                answer: 0,
+                feedback: "La capture d'écran enregistre instantanément tout ou partie de l'affichage du moniteur."
+            },
+            {
+                q: "Dans quel cas la capture d'écran est-elle particulièrement utile pour un exposé ?",
+                options: [
+                    "Pour récupérer un détail précis, un graphique interactif ou un plan/carte sur le Web",
+                    "Pour photographier son professeur en classe sans permission",
+                    "Pour enregistrer sa propre voix",
+                    "Pour augmenter le volume du haut-parleur"
+                ],
+                answer: 0,
+                feedback: "Elle permet d'isoler une portion d'information affichée à l'écran (carte géographique, tableau, schéma)."
+            },
+
+            // Slide 6 : Comment retoucher une image ? (3 actions clés)
+            {
+                q: "En quoi consiste l'action de « Rogner » une image ?",
+                options: [
+                    "Couper ce qui dépasse pour garder uniquement l'élément important",
+                    "Agrandir l'image sur toute la page",
+                    "Augmenter le contraste et la saturation",
+                    "Supprimer le fichier définitivement"
+                ],
+                answer: 0,
+                feedback: "Rogner élimine les bordures inutiles et recentre le regard sur le sujet essentiel."
+            },
+            {
+                q: "Que signifie « Redimensionner » une image dans un document ?",
+                options: [
+                    "Ajuster la taille de l'image pour qu'elle rentre harmonieusement sur la page",
+                    "Effacer les couleurs pour la rendre noire et blanche",
+                    "L'enregistrer dans un fichier audio",
+                    "Découper les têtes des personnages"
+                ],
+                answer: 0,
+                feedback: "Redimensionner adapte les dimensions (largeur/hauteur) à la mise en page sans couper l'image."
+            },
+            {
+                q: "Que fait-on lorsqu'on choisit d'« Ajuster » une image ?",
+                options: [
+                    "Régler la luminosité ou le contraste pour la rendre bien lisible et nette",
+                    "Changer le format du texte de l'exposé",
+                    "La supprimer si elle est trop foncée",
+                    "La traduire en anglais"
+                ],
+                answer: 0,
+                feedback: "Ajuster améliore la clarté visuelle en corrigeant l'éclairage et les contrastes."
+            },
+
+            // Slide 7 & 8 : Capturer et modifier le son (Audio simple)
+            {
+                q: "Pourquoi utilise-t-on le micro pour enregistrer une « voix-off » ?",
+                options: [
+                    "Pour expliquer et commenter un document ou une présentation à l'oral",
+                    "Pour écouter de la musique avec un casque",
+                    "Pour taper du texte plus vite sans clavier",
+                    "Pour effacer les bruits d'un dessin"
+                ],
+                answer: 0,
+                feedback: "La voix-off est une narration audio qui accompagne et explicite les visuels."
+            },
+            {
+                q: "Lors du montage audio, pourquoi est-il utile de « Couper les hésitations » ?",
+                options: [
+                    "Pour supprimer les blancs, les 'euh...' ou les bruits inutiles et rendre l'écoute fluide",
+                    "Pour accélérer la voix comme un robot",
+                    "Pour transformer la voix en chant d'opéra",
+                    "Pour supprimer tout l'enregistrement"
+                ],
+                answer: 0,
+                feedback: "Le nettoyage audio élimine les temps morts et les parasites sonores pour un rendu professionnel."
+            },
+            {
+                q: "Quelle est la règle d'or lors de l'ajout d'une musique en fond sonore derrière une voix ?",
+                options: [
+                    "Placer une musique douce en fond sonore pour ne pas masquer la voix",
+                    "Mettre la musique au volume maximum pour impressionner la classe",
+                    "Mettre deux musiques différentes en même temps",
+                    "Couper la voix pour ne laisser que la musique"
+                ],
+                answer: 0,
+                feedback: "La musique de fond (ambiance) doit rester discrète et douce afin de préserver l'intelligibilité de la voix."
+            },
+            {
+                q: "Quel format audio est particulièrement recommandé pour obtenir un fichier léger et facile à partager ?",
+                options: [
+                    "Le format MP3",
+                    "Le format BMP",
+                    "Le format EXE",
+                    "Le format PDF"
+                ],
+                answer: 0,
+                feedback: "Le MP3 compresse le son efficacement tout en conservant une excellente qualité d'écoute."
+            },
+
+            // Slide 9 & 10 : La vidéo et l'animation (Montage simple)
+            {
+                q: "Quelle est la première étape d'un montage vidéo : « Importer et ordonner » ?",
+                options: [
+                    "Rassembler ses vidéos et images dans la ligne du temps (timeline) et les placer dans le bon ordre",
+                    "Exporter la vidéo finale directement sans regarder",
+                    "Supprimer toutes les pistes audio",
+                    "Ajouter 50 effets spéciaux d'explosion"
+                ],
+                answer: 0,
+                feedback: "On commence par disposer les médias sur la timeline dans l'ordre chronologique de l'histoire."
+            },
+            {
+                q: "Qu'est-ce que la « Timeline » (ligne du temps) dans un logiciel de montage vidéo ?",
+                options: [
+                    "L'espace de travail horizontal où l'on organise la succession des clips vidéo et des pistes son",
+                    "La montre connectée du professeur",
+                    "Le compte à rebours avant la fin du cours",
+                    "Le calendrier des vacances scolaires"
+                ],
+                answer: 0,
+                feedback: "La timeline structure l'enchaînement temporel des scènes vidéo et des pistes audio."
+            },
+            {
+                q: "À quoi servent « Les transitions fluides » entre deux scènes vidéo ?",
+                options: [
+                    "À enchaîner les séquences de manière douce et agréable à regarder",
+                    "À couper l'électricité de l'ordinateur",
+                    "À augmenter la durée de la vidéo de 2 heures",
+                    "À masquer les fautes d'orthographe du titre"
+                ],
+                answer: 0,
+                feedback: "Les transitions (fondu, volet...) évitent les coupures brutales entre deux plans."
+            },
+            {
+                q: "Pourquoi est-il conseillé d'ajouter un « Titre au début » et des « Sous-titres » dans une vidéo ?",
+                options: [
+                    "Pour poser clairement le sujet dès le départ et aider à la compréhension de tous",
+                    "Pour cacher l'image de fond",
+                    "Pour empêcher les spectateurs de voir la fin",
+                    "Pour utiliser plus de mémoire vive"
+                ],
+                answer: 0,
+                feedback: "Le titre annonce la thématique et les sous-titres renforcent l'accessibilité du contenu."
+            },
+
+            // Slide 11 : Animer ses histoires (3 techniques)
+            {
+                q: "Comment crée-t-on des dessins animés interactifs avec « Scratch » ?",
+                options: [
+                    "En programmant des lutins (personnages) avec des blocs d'instructions logiques",
+                    "En découpant des feuilles de papier avec des ciseaux",
+                    "En enregistrant uniquement sa voix au micro",
+                    "En achetant des scènes 3D payantes"
+                ],
+                answer: 0,
+                feedback: "Scratch permet d'animer des lutins et de créer des histoires interactives par blocs de code."
+            },
+            {
+                q: "En quoi consiste la technique d'animation du « Stop-Motion » ?",
+                options: [
+                    "Prendre des objets en photo pas à pas en les déplaçant légèrement pour créer l'illusion du mouvement",
+                    "Filmer un train à grande vitesse sans s'arrêter",
+                    "Mettre une vidéo sur pause pendant 10 minutes",
+                    "Dessiner un cercle sur un tableau blanc"
+                ],
+                answer: 0,
+                feedback: "Le stop-motion (animation image par image) crée le mouvement à partir d'une suite de photos successives."
+            },
+            {
+                q: "Comment réalise-t-on une animation simple dans un « Diaporama » ?",
+                options: [
+                    "En faisant apparaître des textes et des images progressivement au fur et à mesure de l'oral",
+                    "En faisant tourner les diapositives à l'envers",
+                    "En insérant 100 photos sur la même page sans texte",
+                    "En éteignant le vidéoprojecteur"
+                ],
+                answer: 0,
+                feedback: "Les animations d'apparition progressive cadencent la présentation sans surcharger l'auditoire."
+            },
+
+            // Slide 12 : 3 Règles fondamentales (Le Code d'Honneur)
+            {
+                q: "Que stipule la règle n°1 du Code d'Honneur concernant le « Droit d'Auteur » ?",
+                options: [
+                    "Privilégier impérativement les images et les musiques libres de droits",
+                    "Télécharger n'importe quelle musique commerciale payante",
+                    "Prétendre avoir composé toutes les musiques trouvées sur Internet",
+                    "Interdire aux autres d'écouter son exposé"
+                ],
+                answer: 0,
+                feedback: "Le respect du droit d'auteur impose l'usage d'œuvres sous licences libres ou autorisées."
+            },
+            {
+                q: "Que prescrit la règle n°2 du Code d'Honneur sur le « Droit à l'Image » ?",
+                options: [
+                    "Toujours demander l'autorisation préalable avant de filmer ou de publier un camarade",
+                    "Filmer ses camarades en cachette pour faire rire la classe",
+                    "Poster des vidéos de la récréation sur les réseaux publics",
+                    "Prendre des photos sans demander l'avis de personne"
+                ],
+                answer: 0,
+                feedback: "Filmer ou photographier une personne nécessite obligatoirement son accord exprès préalable."
+            },
+            {
+                q: "Que doit-on faire selon la règle n°3 : « Citer tes sources » ?",
+                options: [
+                    "Indiquer clairement d'où viennent les documents, images et musiques réutilisés",
+                    "Écrire 'Trouvé sur Google' sans préciser l'auteur",
+                    "Cacher le nom des sites web utilisés",
+                    "Effacer les signatures sur les photos"
+                ],
+                answer: 0,
+                feedback: "Citer ses sources est une obligation éthique et légale pour créditer le travail d'autrui."
+            },
+
+            // Slide 13 & 14 : La Caisse à Outils : Les logiciels gratuits
+            {
+                q: "Quels logiciels gratuits de bureautique permettent de créer des textes et des diaporamas ?",
+                options: [
+                    "LibreOffice Writer / LibreOffice Impress",
+                    "Audacity et Shotcut",
+                    "PhotoFiltre et Paint",
+                    "Scratch et Python"
+                ],
+                answer: 0,
+                feedback: "La suite libre LibreOffice intègre Writer pour le texte et Impress pour les diaporamas."
+            },
+            {
+                q: "Quels outils gratuits et simples sont recommandés pour retoucher des photos et faire de belles mises en page ?",
+                options: [
+                    "PhotoFiltre / Canva",
+                    "Audacity",
+                    "VLC Media Player",
+                    "Bloc-notes Windows"
+                ],
+                answer: 0,
+                feedback: "PhotoFiltre et Canva permettent la retouche d'images et la création de visuels attractifs."
+            },
+            {
+                q: "Quel logiciel libre et gratuit est la référence pour enregistrer sa voix et monter des pistes audio ?",
+                options: [
+                    "Audacity",
+                    "LibreOffice Writer",
+                    "PhotoFiltre",
+                    "PowerPoint"
+                ],
+                answer: 0,
+                feedback: "Audacity est le logiciel référence pour l'enregistrement micro et le montage multipiste audio."
+            },
+            {
+                q: "Quels logiciels gratuits sont recommandés pour assembler des extraits vidéo et des sons dans un montage ?",
+                options: [
+                    "OpenShot / Shotcut",
+                    "LibreOffice Impress",
+                    "Audacity",
+                    "Scratch"
+                ],
+                answer: 0,
+                feedback: "OpenShot et Shotcut sont des éditeurs vidéo complets, intuitifs et libres de droits."
+            },
+
+            // Slide 15 : Les 4 étapes du projet (Le Plan d'Action)
+            {
+                q: "Quelles sont les 4 étapes chronologiques du « Plan d'Action » d'un projet multimédia ?",
+                options: [
+                    "1. Réfléchir ➔ 2. Capturer ➔ 3. Éditer ➔ 4. Partager",
+                    "1. Partager ➔ 2. Éditer ➔ 3. Capturer ➔ 4. Réfléchir",
+                    "1. Éditer ➔ 2. Partager ➔ 3. Réfléchir ➔ 4. Capturer",
+                    "1. Filmer ➔ 2. Effacer ➔ 3. Recommencer ➔ 4. Quitter"
+                ],
+                answer: 0,
+                feedback: "La méthode projet suit : 1. Scénariser/Réfléchir ➔ 2. Prises de vue/son ➔ 3. Montage/Édition ➔ 4. Restitution."
+            },
+            {
+                q: "Que fait-on lors de l'Étape 1 : « Réfléchir » du plan d'action ?",
+                options: [
+                    "Définir le sujet, identifier le public visé et écrire un scénario",
+                    "Lancer le logiciel de montage immédiatement",
+                    "Exporter la vidéo en MP4",
+                    "Présenter son exposé devant la classe"
+                ],
+                answer: 0,
+                feedback: "La phase préparatoire définit les objectifs, le public et le fil conducteur (scénario)."
+            },
+            {
+                q: "Que réalise-t-on lors de l'Étape 2 : « Capturer » ?",
+                options: [
+                    "Prendre les photos et enregistrer les sons et vidéos nécessaires au projet",
+                    "Corriger les fautes d'orthographe sur l'ENT",
+                    "Changer le mot de passe de sa session",
+                    "Rédiger la conclusion finale"
+                ],
+                answer: 0,
+                feedback: "C'est la phase de collecte et de captation de l'ensemble des éléments bruts."
+            },
+            {
+                q: "Que réalise-t-on lors de l'Étape 3 : « Éditer » ?",
+                options: [
+                    "Retoucher les images, couper les pistes audio et assembler les scènes dans le logiciel",
+                    "Éteindre l'ordinateur pour aller en récréation",
+                    "Imprimer 50 feuilles de brouillon",
+                    "Supprimer toutes les photos capturées"
+                ],
+                answer: 0,
+                feedback: "L'édition correspond à la post-production : retouche, coupes, ajouts d'effets et assemblage."
+            },
+            {
+                q: "En quoi consiste l'Étape 4 finale : « Partager » ?",
+                options: [
+                    "Exporter le document/vidéo dans un format adapté et le présenter fièrement en classe",
+                    "Garder le fichier caché sur une clé USB sans le montrer",
+                    "Effacer son projet dès qu'il est terminé",
+                    "Envoyer le fichier par erreur à un inconnu"
+                ],
+                answer: 0,
+                feedback: "Le partage finalise la mission par l'exportation et la diffusion pédagogique auprès du public."
+            },
+
+            // Slide 16 : Validation des compétences Pix en 6ème
+            {
+                q: "Quelle certification officielle valide l'ensemble de ces compétences multimédia au collège ?",
+                options: [
+                    "Les compétences Pix en 6ème",
+                    "Le permis de conduire des deux-roues",
+                    "Le diplôme de cinéma professionnel",
+                    "Le brevet des collèges dès la 6ème"
+                ],
+                answer: 0,
+                feedback: "La maîtrise du traitement des données et des contenus multimédia valide le parcours Pix 6ème."
+            }
+        ];
+
+        let questions = [];
+        let currentIndex = 0;
+        let score = 0;
+        let isAnswered = false;
+
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        const questionText = document.getElementById('question-text');
+        const questionIndexLabel = document.getElementById('question-index-label');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const progressText = document.getElementById('progress-text');
+        const liveScore = document.getElementById('live-score');
+        const feedbackBox = document.getElementById('feedback-box');
+        const feedbackTitle = document.getElementById('feedback-title');
+        const feedbackDesc = document.getElementById('feedback-desc');
+        const nextBtn = document.getElementById('next-btn');
+
+        function shuffleArray(arr) {
+            const copy = [...arr];
+            for (let i = copy.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [copy[i], copy[j]] = [copy[j], copy[i]];
+            }
+            return copy;
+        }
+
+        function initQuiz() {
+            questions = shuffleArray(rawQuestions).map(q => {
+                const mappedOptions = q.options.map((optText, originalIndex) => ({
+                    text: optText,
+                    isCorrect: originalIndex === q.answer
+                }));
+                return {
+                    q: q.q,
+                    options: shuffleArray(mappedOptions),
+                    feedback: q.feedback
+                };
+            });
+
+            currentIndex = 0;
+            score = 0;
+            isAnswered = false;
+
+            quizView.style.display = 'block';
+            resultsView.style.display = 'none';
+            liveScore.innerText = `Score : 0 / ${questions.length}`;
+
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            isAnswered = false;
+            nextBtn.disabled = true;
+            feedbackBox.style.display = 'none';
+
+            const total = questions.length;
+            const currentNum = currentIndex + 1;
+            const qData = questions[currentIndex];
+
+            progressText.innerText = `Question ${currentNum} sur ${total}`;
+            questionIndexLabel.innerText = `Question ${currentNum} / ${total}`;
+            progressBar.style.width = `${(currentNum / total) * 100}%`;
+
+            questionText.innerText = qData.q;
+
+            optionsContainer.innerHTML = '';
+            qData.options.forEach((opt, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-button';
+                btn.innerText = opt.text;
+                btn.onclick = () => handleSelectOption(idx, opt.isCorrect);
+                optionsContainer.appendChild(btn);
+            });
+
+            if (currentIndex === total - 1) {
+                nextBtn.innerText = "Consulter le Bilan Multimédia ➔";
+            } else {
+                nextBtn.innerText = "Question suivante ➔";
+            }
+        }
+
+        function handleSelectOption(selectedIdx, isCorrect) {
+            if (isAnswered) return;
+            isAnswered = true;
+
+            const buttons = optionsContainer.querySelectorAll('.option-button');
+            const qData = questions[currentIndex];
+
+            buttons.forEach((btn, idx) => {
+                btn.disabled = true;
+                if (qData.options[idx].isCorrect) {
+                    btn.classList.add('correct');
+                } else if (idx === selectedIdx) {
+                    btn.classList.add('wrong');
+                } else {
+                    btn.classList.add('dimmed');
+                }
+            });
+
+            if (isCorrect) {
+                score++;
+                feedbackBox.className = 'feedback-container correct';
+                feedbackTitle.innerText = "✓ Bonne réponse !";
+            } else {
+                feedbackBox.className = 'feedback-container wrong';
+                feedbackTitle.innerText = "✕ Mauvaise réponse !";
+            }
+
+            liveScore.innerText = `Score : ${score} / ${questions.length}`;
+            feedbackDesc.innerText = qData.feedback;
+            feedbackBox.style.display = 'block';
+
+            nextBtn.disabled = false;
+        }
+
+        nextBtn.addEventListener('click', () => {
+            if (currentIndex < questions.length - 1) {
+                currentIndex++;
+                renderQuestion();
+            } else {
+                showResults();
+            }
+        });
+
+        function showResults() {
+            quizView.style.display = 'none';
+            resultsView.style.display = 'block';
+
+            const total = questions.length;
+            const percent = Math.round((score / total) * 100);
+
+            document.getElementById('final-percent').innerText = `${percent}%`;
+            document.getElementById('stat-correct-count').innerText = score;
+            document.getElementById('stat-wrong-count').innerText = total - score;
+
+            const titleEl = document.getElementById('result-title-text');
+            const descEl = document.getElementById('result-desc-text');
+
+            if (percent >= 90) {
+                titleEl.innerText = "🏆 Grand Réalisateur Multimédia Pix !";
+                descEl.innerText = "Félicitations ! Tu maîtrises l'ensemble de la chaîne de production multimédia : manipulation d'images (rogner, ajuster), montage audio (voix-off, MP3, Audacity), montage vidéo (timeline, transitions, OpenShot/Shotcut), animation (Scratch, stop-motion) et respect strict du Code d'Honneur (droit d'auteur, droit à l'image, citation des sources). Tu es un as du numérique !";
+            } else if (percent >= 75) {
+                titleEl.innerText = "⭐ Créateur Multimédia Averti !";
+                descEl.innerText = "Très bon score ! Tu connais les bons outils (LibreOffice, Canva, Audacity, OpenShot) et les 4 étapes fondamentales (Réfléchir, Capturer, Éditer, Partager) pour enrichir tes exposés au collège.";
+            } else if (percent >= 50) {
+                titleEl.innerText = "🎬 Apprenti Réalisateur";
+                descEl.innerText = "Tu as compris les bases du multimédia, mais sois attentif aux détails techniques : revois la différence entre photo et capture d'écran, le rôle d'une timeline vidéo, le dosage de la musique de fond et les règles de citation des sources.";
+            } else {
+                titleEl.innerText = "⚠️ Manuel Multimédia à Réviser";
+                descEl.innerText = "Attention à ne pas tout mélanger ! Relis attentivement les 4 formes du multimédia, le Code d'Honneur et les 4 étapes du projet, puis retente l'évaluation pour valider tes compétences Pix 6ème.";
+            }
+        }
+
+        function restartQuiz() {
+            initQuiz();
+        }
+
+        window.addEventListener('DOMContentLoaded', initQuiz);
+    </script>
+</body>
+</html>
